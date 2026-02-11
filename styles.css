@@ -1,0 +1,27 @@
+body {
+  background: #f5f7fb;
+}
+
+.editor-shell {
+  min-height: 100vh;
+}
+
+.json-preview {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    'Liberation Mono', 'Courier New', monospace;
+  white-space: pre-wrap;
+  word-break: break-word;
+  border-radius: 12px;
+  background: #111827;
+  color: #f9fafb;
+  padding: 16px;
+  min-height: 240px;
+}
+
+.block-card {
+  border-left: 5px solid #1976d2;
+}
+
+.task-card {
+  border-left-color: #7e57c2;
+}
