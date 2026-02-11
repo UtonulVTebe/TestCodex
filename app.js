@@ -1,10 +1,6 @@
 const { createApp, ref, computed } = Vue;
 const { useQuasar } = Quasar;
 
-/**
- * Здесь хранится исходная структура лекции.
- * Любые изменения через форму сразу попадают в этот объект.
- */
 const initialLecture = {
   id: 'lecture-001',
   title: 'Новая лекция',
@@ -18,7 +14,8 @@ const initialLecture = {
       title: 'Задание 1',
       description: 'Опишите решение задачи своими словами.',
       difficulty: 'easy',
-      points: 5
+      points: 5,
+      expectedAnswer: ''
     }
   ]
 };
@@ -28,13 +25,13 @@ createApp({
     const $q = useQuasar();
     const lecture = ref(structuredClone(initialLecture));
     const previewMode = ref('render');
+    const dragIndex = ref(null);
 
     const blockTypeOptions = [
       { label: 'Paragraph', value: 'paragraph' },
       { label: 'Task-1', value: 'task-1' }
     ];
 
-    /** Добавление простого текстового блока */
     function addParagraph() {
       lecture.value.blocks.push({
         type: 'paragraph',
@@ -42,14 +39,14 @@ createApp({
       });
     }
 
-    /** Добавление блока задания */
     function addTask() {
       lecture.value.blocks.push({
         type: 'task-1',
         title: '',
         description: '',
         difficulty: 'easy',
-        points: 1
+        points: 1,
+        expectedAnswer: ''
       });
     }
 
@@ -70,10 +67,25 @@ createApp({
       lecture.value.blocks.splice(target, 0, item);
     }
 
-    /**
-     * Нормализация нужна, чтобы в JSON оставались только поля,
-     * соответствующие выбранному типу блока.
-     */
+    function onDragStart(index) {
+      dragIndex.value = index;
+    }
+
+    function onDrop(targetIndex) {
+      if (dragIndex.value === null || dragIndex.value === targetIndex) {
+        dragIndex.value = null;
+        return;
+      }
+
+      const [item] = lecture.value.blocks.splice(dragIndex.value, 1);
+      lecture.value.blocks.splice(targetIndex, 0, item);
+      dragIndex.value = null;
+    }
+
+    function onDragEnd() {
+      dragIndex.value = null;
+    }
+
     function normalizeBlocks() {
       lecture.value.blocks = lecture.value.blocks.map((block) => {
         if (block.type === 'paragraph') {
@@ -88,15 +100,12 @@ createApp({
           title: block.title || '',
           description: block.description || '',
           difficulty: block.difficulty || 'easy',
-          points: Number(block.points) || 0
+          points: Number(block.points) || 0,
+          expectedAnswer: block.expectedAnswer || ''
         };
       });
     }
 
-    /**
-     * Это и есть предпросмотр: вычисляемая строка JSON.
-     * Любое изменение lecture автоматически пересчитывает preview.
-     */
     const lectureJson = computed(() => JSON.stringify(lecture.value, null, 2));
 
     async function copyJson() {
@@ -125,6 +134,7 @@ createApp({
     return {
       lecture,
       previewMode,
+      dragIndex,
       blockTypeOptions,
       lectureJson,
       addParagraph,
@@ -132,6 +142,9 @@ createApp({
       removeBlock,
       duplicateBlock,
       moveBlock,
+      onDragStart,
+      onDrop,
+      onDragEnd,
       normalizeBlocks,
       copyJson,
       resetLecture
@@ -167,7 +180,7 @@ createApp({
               <q-card flat bordered class="q-pa-md q-mb-md">
                 <div class="text-h6 q-mb-xs">Лекция</div>
                 <div class="text-caption text-grey-7 q-mb-md">
-                  Слева редактируете структуру, справа сразу видите итоговый JSON.
+                  Слева редактируете структуру, справа сразу видите итоговый рендер и JSON.
                 </div>
 
                 <div class="row q-col-gutter-md">
@@ -197,8 +210,13 @@ createApp({
                 :key="index"
                 flat
                 bordered
+                draggable="true"
+                @dragstart="onDragStart(index)"
+                @dragover.prevent
+                @drop="onDrop(index)"
+                @dragend="onDragEnd"
                 class="q-pa-md q-mb-sm block-card"
-                :class="{ 'task-card': block.type === 'task-1' }"
+                :class="{ 'task-card': block.type === 'task-1', 'dragging': dragIndex === index }"
               >
                 <div class="row items-center q-col-gutter-md q-mb-sm">
                   <div class="col-12 col-md-4">
@@ -214,8 +232,12 @@ createApp({
                       dense
                     />
                   </div>
-                  <div class="col-grow text-subtitle2">Блок #{{ index + 1 }}</div>
+                  <div class="col-grow text-subtitle2">
+                    Блок #{{ index + 1 }}
+                    <span class="text-caption text-grey-7"> · перетащите блок мышкой для изменения порядка</span>
+                  </div>
                   <div class="col-auto">
+                    <q-btn dense flat round icon="drag_indicator" />
                     <q-btn dense flat round icon="arrow_upward" @click="moveBlock(index, -1)" />
                     <q-btn dense flat round icon="arrow_downward" @click="moveBlock(index, 1)" />
                     <q-btn dense flat round icon="content_copy" @click="duplicateBlock(index)" />
@@ -259,6 +281,16 @@ createApp({
                         label="Task description"
                       />
                     </div>
+                    <div class="col-12">
+                      <q-input
+                        v-model="block.expectedAnswer"
+                        type="textarea"
+                        autogrow
+                        outlined
+                        label="Ожидаемый ответ / ключ проверки"
+                        hint="Сюда можно записать эталон или критерии оценки"
+                      />
+                    </div>
                   </div>
                 </template>
               </q-card>
@@ -295,9 +327,17 @@ createApp({
                         <div class="lecture-task-description q-mt-xs">
                           {{ block.description || 'Описание не заполнено' }}
                         </div>
-                        <div class="text-caption text-grey-8 q-mt-sm">
+                        <div class="text-caption text-grey-8 q-mt-sm q-mb-sm">
                           Сложность: {{ block.difficulty || 'easy' }} · Баллы: {{ Number(block.points) || 0 }}
                         </div>
+                        <q-input
+                          type="textarea"
+                          autogrow
+                          outlined
+                          dense
+                          label="Ваш ответ"
+                          placeholder="Напишите ответ здесь..."
+                        />
                       </section>
                     </template>
                   </div>
