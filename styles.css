@@ -59,3 +59,55 @@ body {
 .lecture-task-description {
   color: #374151;
 }
+
+.dnd-task {
+  background: #eef2ff;
+  border-left-color: #4f46e5;
+}
+
+.dnd-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dnd-item {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  background: #ffffff;
+  border: 1px solid #c7d2fe;
+  border-radius: 999px;
+  color: #3730a3;
+  font-weight: 600;
+  cursor: grab;
+}
+
+.dnd-zones {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+}
+
+.dnd-zone {
+  border: 1px dashed #6366f1;
+  background: #fff;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+.dnd-zone-title {
+  font-weight: 600;
+  color: #1f2937;
+  margin-bottom: 4px;
+}
+
+.dnd-zone-answer {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #e0e7ff;
+  color: #312e81;
+  padding: 4px 8px;
+  border-radius: 999px;
+}

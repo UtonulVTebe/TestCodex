@@ -1,6 +1,31 @@
 const { createApp, ref, computed } = Vue;
 const { useQuasar } = Quasar;
 
+function createTask1() {
+  return {
+    type: 'task-1',
+    title: '',
+    description: '',
+    difficulty: 'easy',
+    points: 1,
+    expectedAnswer: ''
+  };
+}
+
+function createTaskDnd() {
+  return {
+    type: 'task-dnd',
+    title: 'Drag and Drop задание',
+    description: 'Распределите элементы по категориям.',
+    difficulty: 'medium',
+    points: 3,
+    prompt: 'Перетащите каждый элемент в правильную зону',
+    dndItemsText: 'Vue\nReact\nSvelte',
+    dndZonesText: 'Frameworks\nLibraries',
+    expectedAnswer: 'Frameworks: Vue, Svelte; Libraries: React'
+  };
+}
+
 const initialLecture = {
   id: 'lecture-001',
   title: 'Новая лекция',
@@ -10,12 +35,10 @@ const initialLecture = {
       content: 'Здесь будет вводный текст лекции.'
     },
     {
-      type: 'task-1',
+      ...createTask1(),
       title: 'Задание 1',
       description: 'Опишите решение задачи своими словами.',
-      difficulty: 'easy',
-      points: 5,
-      expectedAnswer: ''
+      points: 5
     }
   ]
 };
@@ -27,10 +50,21 @@ createApp({
     const previewMode = ref('render');
     const dragIndex = ref(null);
 
+    const dndAnswers = ref({});
+    const draggedDndItem = ref(null);
+
     const blockTypeOptions = [
       { label: 'Paragraph', value: 'paragraph' },
-      { label: 'Task-1', value: 'task-1' }
+      { label: 'Task-1', value: 'task-1' },
+      { label: 'Task DnD', value: 'task-dnd' }
     ];
+
+    function parseLines(text) {
+      return (text || '')
+        .split('\n')
+        .map((line) => line.trim())
+        .filter(Boolean);
+    }
 
     function addParagraph() {
       lecture.value.blocks.push({
@@ -40,18 +74,16 @@ createApp({
     }
 
     function addTask() {
-      lecture.value.blocks.push({
-        type: 'task-1',
-        title: '',
-        description: '',
-        difficulty: 'easy',
-        points: 1,
-        expectedAnswer: ''
-      });
+      lecture.value.blocks.push(createTask1());
+    }
+
+    function addTaskDnd() {
+      lecture.value.blocks.push(createTaskDnd());
     }
 
     function removeBlock(index) {
       lecture.value.blocks.splice(index, 1);
+      delete dndAnswers.value[index];
     }
 
     function duplicateBlock(index) {
@@ -86,12 +118,63 @@ createApp({
       dragIndex.value = null;
     }
 
+    function ensureDndAnswerBlock(blockIndex) {
+      if (!dndAnswers.value[blockIndex]) {
+        dndAnswers.value[blockIndex] = {};
+      }
+    }
+
+    function onDndAnswerDragStart(blockIndex, item) {
+      draggedDndItem.value = { blockIndex, item };
+    }
+
+    function onDndAnswerDrop(blockIndex, zone) {
+      if (!draggedDndItem.value || draggedDndItem.value.blockIndex !== blockIndex) return;
+
+      ensureDndAnswerBlock(blockIndex);
+      const current = dndAnswers.value[blockIndex];
+
+      Object.keys(current).forEach((zoneName) => {
+        if (current[zoneName] === draggedDndItem.value.item) {
+          delete current[zoneName];
+        }
+      });
+
+      current[zone] = draggedDndItem.value.item;
+      draggedDndItem.value = null;
+    }
+
+    function clearDndZone(blockIndex, zone) {
+      if (!dndAnswers.value[blockIndex]) return;
+      delete dndAnswers.value[blockIndex][zone];
+    }
+
+    function getDndAvailableItems(blockIndex, block) {
+      const allItems = parseLines(block.dndItemsText);
+      const usedItems = Object.values(dndAnswers.value[blockIndex] || {});
+      return allItems.filter((item) => !usedItems.includes(item));
+    }
+
     function normalizeBlocks() {
       lecture.value.blocks = lecture.value.blocks.map((block) => {
         if (block.type === 'paragraph') {
           return {
             type: 'paragraph',
             content: block.content || ''
+          };
+        }
+
+        if (block.type === 'task-dnd') {
+          return {
+            type: 'task-dnd',
+            title: block.title || '',
+            description: block.description || '',
+            difficulty: block.difficulty || 'medium',
+            points: Number(block.points) || 0,
+            prompt: block.prompt || '',
+            dndItems: parseLines(block.dndItemsText),
+            dndZones: parseLines(block.dndZonesText),
+            expectedAnswer: block.expectedAnswer || ''
           };
         }
 
@@ -103,6 +186,11 @@ createApp({
           points: Number(block.points) || 0,
           expectedAnswer: block.expectedAnswer || ''
         };
+      });
+
+      $q.notify({
+        type: 'positive',
+        message: 'Блоки нормализованы'
       });
     }
 
@@ -125,6 +213,8 @@ createApp({
 
     function resetLecture() {
       lecture.value = structuredClone(initialLecture);
+      dndAnswers.value = {};
+      draggedDndItem.value = null;
       $q.notify({
         type: 'info',
         message: 'Лекция сброшена к начальному шаблону'
@@ -139,15 +229,22 @@ createApp({
       lectureJson,
       addParagraph,
       addTask,
+      addTaskDnd,
       removeBlock,
       duplicateBlock,
       moveBlock,
       onDragStart,
       onDrop,
       onDragEnd,
+      onDndAnswerDragStart,
+      onDndAnswerDrop,
+      clearDndZone,
+      getDndAvailableItems,
       normalizeBlocks,
       copyJson,
-      resetLecture
+      resetLecture,
+      parseLines,
+      dndAnswers
     };
   },
   template: `
@@ -201,6 +298,9 @@ createApp({
                   <q-btn color="secondary" icon="task" label="Добавить task-1" @click="addTask" />
                 </div>
                 <div class="col-auto">
+                  <q-btn color="deep-purple" icon="swipe" label="Добавить task-dnd" @click="addTaskDnd" />
+                </div>
+                <div class="col-auto">
                   <q-btn outline color="primary" icon="rule" label="Нормализовать" @click="normalizeBlocks" />
                 </div>
               </div>
@@ -216,7 +316,7 @@ createApp({
                 @drop="onDrop(index)"
                 @dragend="onDragEnd"
                 class="q-pa-md q-mb-sm block-card"
-                :class="{ 'task-card': block.type === 'task-1', 'dragging': dragIndex === index }"
+                :class="{ 'task-card': block.type !== 'paragraph', 'dragging': dragIndex === index }"
               >
                 <div class="row items-center q-col-gutter-md q-mb-sm">
                   <div class="col-12 col-md-4">
@@ -253,6 +353,71 @@ createApp({
                     outlined
                     label="Текст paragraph"
                   />
+                </template>
+
+                <template v-else-if="block.type === 'task-dnd'">
+                  <div class="row q-col-gutter-md">
+                    <div class="col-12 col-md-6">
+                      <q-input v-model="block.title" outlined dense label="Task title" />
+                    </div>
+                    <div class="col-12 col-md-3">
+                      <q-select
+                        v-model="block.difficulty"
+                        :options="['easy', 'medium', 'hard']"
+                        outlined
+                        dense
+                        label="Difficulty"
+                      />
+                    </div>
+                    <div class="col-12 col-md-3">
+                      <q-input v-model.number="block.points" type="number" min="0" outlined dense label="Points" />
+                    </div>
+                    <div class="col-12">
+                      <q-input
+                        v-model="block.description"
+                        type="textarea"
+                        autogrow
+                        outlined
+                        label="Task description"
+                      />
+                    </div>
+                    <div class="col-12">
+                      <q-input
+                        v-model="block.prompt"
+                        type="textarea"
+                        autogrow
+                        outlined
+                        label="Инструкция для drag and drop"
+                      />
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <q-input
+                        v-model="block.dndItemsText"
+                        type="textarea"
+                        autogrow
+                        outlined
+                        label="Перетаскиваемые элементы (по одному на строку)"
+                      />
+                    </div>
+                    <div class="col-12 col-md-6">
+                      <q-input
+                        v-model="block.dndZonesText"
+                        type="textarea"
+                        autogrow
+                        outlined
+                        label="Зоны (по одной на строку)"
+                      />
+                    </div>
+                    <div class="col-12">
+                      <q-input
+                        v-model="block.expectedAnswer"
+                        type="textarea"
+                        autogrow
+                        outlined
+                        label="Ожидаемый ответ / ключ проверки"
+                      />
+                    </div>
+                  </div>
                 </template>
 
                 <template v-else>
@@ -321,6 +486,52 @@ createApp({
                       <p v-if="block.type === 'paragraph'" class="lecture-paragraph">
                         {{ block.content || 'Пустой paragraph' }}
                       </p>
+
+                      <section v-else-if="block.type === 'task-dnd'" class="lecture-task dnd-task q-mb-md">
+                        <div class="lecture-task-title">{{ block.title || 'Drag and Drop задание' }}</div>
+                        <div class="lecture-task-description q-mt-xs">
+                          {{ block.description || 'Описание не заполнено' }}
+                        </div>
+                        <div class="text-caption text-grey-8 q-mt-sm q-mb-sm">
+                          {{ block.prompt || 'Перетащите элементы в нужные зоны' }}
+                        </div>
+
+                        <div class="dnd-items q-mb-md">
+                          <div
+                            v-for="item in getDndAvailableItems(index, block)"
+                            :key="item"
+                            class="dnd-item"
+                            draggable="true"
+                            @dragstart.stop="onDndAnswerDragStart(index, item)"
+                          >
+                            {{ item }}
+                          </div>
+                        </div>
+
+                        <div class="dnd-zones">
+                          <div
+                            v-for="zone in parseLines(block.dndZonesText)"
+                            :key="zone"
+                            class="dnd-zone"
+                            @dragover.prevent
+                            @drop.prevent="onDndAnswerDrop(index, zone)"
+                          >
+                            <div class="dnd-zone-title">{{ zone }}</div>
+                            <div v-if="dndAnswers[index] && dndAnswers[index][zone]" class="dnd-zone-answer">
+                              {{ dndAnswers[index][zone] }}
+                              <q-btn
+                                dense
+                                flat
+                                size="sm"
+                                icon="close"
+                                color="negative"
+                                @click="clearDndZone(index, zone)"
+                              />
+                            </div>
+                            <div v-else class="text-caption text-grey-7">Перетащите элемент сюда</div>
+                          </div>
+                        </div>
+                      </section>
 
                       <section v-else class="lecture-task q-mb-md">
                         <div class="lecture-task-title">{{ block.title || 'Задание без названия' }}</div>
