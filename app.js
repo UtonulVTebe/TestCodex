@@ -27,6 +27,7 @@ createApp({
   setup() {
     const $q = useQuasar();
     const lecture = ref(structuredClone(initialLecture));
+    const previewMode = ref('render');
 
     const blockTypeOptions = [
       { label: 'Paragraph', value: 'paragraph' },
@@ -123,6 +124,7 @@ createApp({
 
     return {
       lecture,
+      previewMode,
       blockTypeOptions,
       lectureJson,
       addParagraph,
@@ -264,11 +266,50 @@ createApp({
 
             <div class="col-12 col-lg-5">
               <q-card flat bordered class="q-pa-md sticky" style="position: sticky; top: 16px">
-                <div class="text-h6 q-mb-xs">JSON Preview</div>
-                <div class="text-caption text-grey-7 q-mb-md">
-                  Это готовый конфиг для рендера лекции. Можно копировать как есть.
-                </div>
-                <div class="json-preview">{{ lectureJson }}</div>
+                <q-tabs
+                  v-model="previewMode"
+                  dense
+                  class="text-primary"
+                  active-color="primary"
+                  indicator-color="primary"
+                  align="left"
+                >
+                  <q-tab name="render" icon="visibility" label="Как увидит студент" />
+                  <q-tab name="json" icon="data_object" label="JSON" />
+                </q-tabs>
+
+                <q-separator class="q-my-md" />
+
+                <template v-if="previewMode === 'render'">
+                  <div class="text-h6 q-mb-sm">{{ lecture.title || 'Без названия' }}</div>
+                  <div class="text-caption text-grey-7 q-mb-md">ID: {{ lecture.id || '—' }}</div>
+
+                  <div class="lecture-render">
+                    <template v-for="(block, index) in lecture.blocks" :key="index">
+                      <p v-if="block.type === 'paragraph'" class="lecture-paragraph">
+                        {{ block.content || 'Пустой paragraph' }}
+                      </p>
+
+                      <section v-else class="lecture-task q-mb-md">
+                        <div class="lecture-task-title">{{ block.title || 'Задание без названия' }}</div>
+                        <div class="lecture-task-description q-mt-xs">
+                          {{ block.description || 'Описание не заполнено' }}
+                        </div>
+                        <div class="text-caption text-grey-8 q-mt-sm">
+                          Сложность: {{ block.difficulty || 'easy' }} · Баллы: {{ Number(block.points) || 0 }}
+                        </div>
+                      </section>
+                    </template>
+                  </div>
+                </template>
+
+                <template v-else>
+                  <div class="text-h6 q-mb-xs">JSON Preview</div>
+                  <div class="text-caption text-grey-7 q-mb-md">
+                    Это готовый конфиг для рендера лекции. Можно копировать как есть.
+                  </div>
+                  <div class="json-preview">{{ lectureJson }}</div>
+                </template>
               </q-card>
             </div>
           </div>

@@ -25,3 +25,31 @@ body {
 .task-card {
   border-left-color: #7e57c2;
 }
+
+.lecture-render {
+  max-height: 70vh;
+  overflow: auto;
+  padding-right: 6px;
+}
+
+.lecture-paragraph {
+  margin: 0 0 14px;
+  line-height: 1.6;
+  color: #1f2937;
+}
+
+.lecture-task {
+  border-left: 4px solid #7e57c2;
+  background: #f3e8ff;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.lecture-task-title {
+  font-weight: 700;
+  color: #4c1d95;
+}
+
+.lecture-task-description {
+  color: #374151;
+}
