@@ -1,0 +1,96 @@
+body {
+  background: #f5f7fb;
+}
+
+.editor-shell {
+  min-height: 100vh;
+}
+
+.block-card {
+  border-left: 4px solid #1976d2;
+  cursor: grab;
+}
+
+.block-card.dragging {
+  opacity: 0.65;
+}
+
+.sticky-preview {
+  position: sticky;
+  top: 16px;
+}
+
+.preview-block {
+  border-left: 4px solid #7e57c2;
+  background: #f3e8ff;
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+
+.lecture-paragraph {
+  margin: 0;
+  line-height: 1.6;
+  color: #1f2937;
+}
+
+.lecture-task-title {
+  font-weight: 700;
+  color: #4c1d95;
+  margin-bottom: 8px;
+}
+
+.dnd-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.dnd-item {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  background: #fff;
+  border: 1px solid #c7d2fe;
+  border-radius: 999px;
+  color: #3730a3;
+  font-weight: 600;
+  cursor: grab;
+}
+
+.dnd-zones {
+  display: grid;
+  gap: 8px;
+}
+
+.dnd-zone {
+  border: 1px dashed #6366f1;
+  border-radius: 8px;
+  background: #fff;
+  padding: 8px;
+}
+
+.dnd-zone-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.dnd-zone-answer {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #e0e7ff;
+  color: #312e81;
+  border-radius: 999px;
+  padding: 4px 8px;
+}
+
+.json-preview {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+  white-space: pre-wrap;
+  word-break: break-word;
+  border-radius: 12px;
+  background: #111827;
+  color: #f9fafb;
+  padding: 16px;
+  min-height: 240px;
+}
