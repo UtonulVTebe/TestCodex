@@ -11,13 +11,15 @@
         <q-separator />
         <q-card-section>
           <div class="text-h4 q-mb-sm">{{ overallPercent }}%</div>
-          <q-linear-progress
-            :value="overallPercent / 100"
-            size="12px"
-            rounded
-            color="secondary"
-            track-color="grey-3"
-          />
+          <div class="progress-outline">
+            <q-linear-progress
+              :value="overallPercent / 100"
+              size="12px"
+              rounded
+              color="secondary"
+              track-color="grey-3"
+            />
+          </div>
         </q-card-section>
       </q-card>
 
@@ -36,14 +38,15 @@
                 {{ lecture.viewed ? 'Просмотрена' : 'Не открыта' }} ·
                 Задания: {{ lecture.solvedTasks }}/{{ lecture.totalTasks }}
               </q-item-label>
-              <q-linear-progress
-                :value="lecture.percent / 100"
-                size="10px"
-                rounded
-                color="accent"
-                track-color="grey-3"
-                class="q-mt-sm"
-              />
+              <div class="progress-outline q-mt-sm">
+                <q-linear-progress
+                  :value="lecture.percent / 100"
+                  size="10px"
+                  rounded
+                  color="accent"
+                  track-color="grey-3"
+                />
+              </div>
             </q-item-section>
             <q-item-section side top>
               <div class="text-subtitle2 text-weight-medium">{{ lecture.percent }}%</div>
@@ -102,3 +105,11 @@ onBeforeUnmount(() => {
   window.removeEventListener('lecture-progress-updated', refreshLectures)
 })
 </script>
+
+<style scoped>
+.progress-outline {
+  border: 1px solid #111;
+  border-radius: 8px;
+  padding: 4px;
+}
+</style>
