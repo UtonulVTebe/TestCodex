@@ -21,7 +21,6 @@
 .topbar {
   background: #ffffff;
   color: #111111;
-  border-bottom: 1px solid #111111;
 }
 
 .mono-tabs {
@@ -31,9 +30,18 @@
 
 .tabs-minimal :deep(.q-tab) {
   color: #111111;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  margin-left: 4px;
+}
+
+.tabs-minimal :deep(.q-tab--active) {
+  background: #111111;
+  color: #ffffff;
+  border-color: #111111;
 }
 
 .tabs-minimal :deep(.q-tab__indicator) {
-  background: #111111;
+  background: transparent;
 }
 </style>

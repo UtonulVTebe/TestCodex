@@ -4,20 +4,30 @@ body {
 }
 
 .q-card {
-  border: 1px solid #111111 !important;
   box-shadow: none !important;
   background: #ffffff;
 }
 
+.q-card--bordered {
+  border-color: transparent !important;
+}
+
 .q-separator {
-  background: #111111 !important;
+  background: transparent !important;
 }
 
 .q-item.q-router-link--active {
-  background: #f5f5f5;
-  color: #111111;
+  background: #111111;
+  color: #ffffff;
+  border: 1px solid #111111;
+  border-radius: 6px;
+}
+
+.q-field--focused .q-field__control::before,
+.q-field--focused .q-field__control::after {
+  border-color: #111111 !important;
 }
 
 .q-linear-progress__track {
-  opacity: 0.2;
+  opacity: 0.12;
 }
