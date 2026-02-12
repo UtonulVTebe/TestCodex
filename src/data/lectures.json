@@ -1,0 +1,28 @@
+[
+  {
+    "id": "lecture-001",
+    "title": "Новая лекция",
+    "blocks": [
+      {
+        "type": "paragraph",
+        "content": "Вводный абзац лекции. Здесь можно объяснить тему занятия."
+      },
+      {
+        "type": "paragraph",
+        "content": "Добавьте в JSON новые блоки или типы контента, чтобы расширить лекцию."
+      }
+    ],
+    "progress": 40
+  },
+  {
+    "id": "lecture-002",
+    "title": "Компоненты Quasar",
+    "blocks": [
+      {
+        "type": "paragraph",
+        "content": "QLayout, QPage и QList помогают быстро собрать интерфейс учебного приложения."
+      }
+    ],
+    "progress": 75
+  }
+]
