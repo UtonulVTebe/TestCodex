@@ -1,60 +1,56 @@
 <template>
   <q-page class="q-pa-md">
-    <div class="row q-col-gutter-md">
-      <div class="col-12 col-lg-8">
-        <q-card flat bordered>
-          <q-card-section>
-            <div class="text-h5">Прогресс по лекциям</div>
-            <div class="text-caption text-grey-7">Реальный прогресс по просмотренным и решённым заданиям</div>
-          </q-card-section>
-          <q-separator />
+    <div class="column q-gutter-md">
+      <q-card flat bordered>
+        <q-card-section>
+          <div class="text-subtitle1 text-weight-medium">Общий прогресс</div>
+          <div class="text-caption text-grey-7">
+            По всем лекциям: {{ totalSolvedTasks }}/{{ totalTasks }} заданий
+          </div>
+        </q-card-section>
+        <q-separator />
+        <q-card-section>
+          <div class="text-h4 q-mb-sm">{{ overallPercent }}%</div>
+          <q-linear-progress
+            :value="overallPercent / 100"
+            size="12px"
+            rounded
+            color="secondary"
+            track-color="grey-3"
+          />
+        </q-card-section>
+      </q-card>
 
-          <q-list>
-            <q-item v-for="lecture in lectureStats" :key="lecture.id" class="q-py-md">
-              <q-item-section>
-                <q-item-label>{{ lecture.title }}</q-item-label>
-                <q-item-label caption>
-                  {{ lecture.viewed ? 'Просмотрена' : 'Не открыта' }} ·
-                  Задания: {{ lecture.solvedTasks }}/{{ lecture.totalTasks }}
-                </q-item-label>
-                <q-linear-progress
-                  :value="lecture.percent / 100"
-                  size="10px"
-                  rounded
-                  color="primary"
-                  track-color="grey-3"
-                  class="q-mt-sm"
-                />
-              </q-item-section>
-              <q-item-section side top>
-                <div class="text-subtitle2 text-weight-medium">{{ lecture.percent }}%</div>
-              </q-item-section>
-            </q-item>
-          </q-list>
-        </q-card>
-      </div>
+      <q-card flat bordered>
+        <q-card-section>
+          <div class="text-h5">Прогресс по лекциям</div>
+          <div class="text-caption text-grey-7">Реальный прогресс по просмотренным и решённым заданиям</div>
+        </q-card-section>
+        <q-separator />
 
-      <div class="col-12 col-lg-4">
-        <q-card flat bordered>
-          <q-card-section>
-            <div class="text-subtitle1 text-weight-medium">Общий прогресс</div>
-            <div class="text-caption text-grey-7">
-              По всем лекциям: {{ totalSolvedTasks }}/{{ totalTasks }} заданий
-            </div>
-          </q-card-section>
-          <q-separator />
-          <q-card-section>
-            <div class="text-h4 q-mb-sm">{{ overallPercent }}%</div>
-            <q-linear-progress
-              :value="overallPercent / 100"
-              size="12px"
-              rounded
-              color="positive"
-              track-color="grey-3"
-            />
-          </q-card-section>
-        </q-card>
-      </div>
+        <q-list>
+          <q-item v-for="lecture in lectureStats" :key="lecture.id" class="q-py-md">
+            <q-item-section>
+              <q-item-label>{{ lecture.title }}</q-item-label>
+              <q-item-label caption>
+                {{ lecture.viewed ? 'Просмотрена' : 'Не открыта' }} ·
+                Задания: {{ lecture.solvedTasks }}/{{ lecture.totalTasks }}
+              </q-item-label>
+              <q-linear-progress
+                :value="lecture.percent / 100"
+                size="10px"
+                rounded
+                color="accent"
+                track-color="grey-3"
+                class="q-mt-sm"
+              />
+            </q-item-section>
+            <q-item-section side top>
+              <div class="text-subtitle2 text-weight-medium">{{ lecture.percent }}%</div>
+            </q-item-section>
+          </q-item>
+        </q-list>
+      </q-card>
     </div>
   </q-page>
 </template>
