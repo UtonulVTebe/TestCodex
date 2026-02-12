@@ -9,12 +9,14 @@
       },
       {
         "type": "task_text",
-        "question": "Коротко сформулируйте цель этой лекции"
+        "question": "Коротко сформулируйте цель этой лекции",
+        "expectedAnswer": "цель"
       },
       {
         "type": "task_single_choice",
         "question": "Какой компонент Quasar отвечает за каркас страницы?",
-        "options": ["QLayout", "QAvatar", "QChip"]
+        "options": ["QLayout", "QAvatar", "QChip"],
+        "correctIndex": 0
       }
     ],
     "progress": 40
@@ -26,7 +28,8 @@
       {
         "type": "task_multi_choice",
         "question": "Какие типы заданий поддерживаются?",
-        "options": ["Один ответ", "Несколько ответов", "Сопоставление", "Drag and drop"]
+        "options": ["Один ответ", "Несколько ответов", "Сопоставление", "Drag and drop"],
+        "correctIndices": [0, 1, 2, 3]
       },
       {
         "type": "task_matching",
@@ -40,17 +43,13 @@
         "type": "task_drag_drop",
         "question": "Распределите элементы по зонам",
         "items": ["Кнопка", "Поле ввода"],
-        "targets": ["Форма", "Панель действий"]
+        "targets": ["Форма", "Панель действий"],
+        "correctTargets": [1, 0]
       },
       {
         "type": "task_algorithm",
         "question": "Опишите алгоритм создания новой лекции",
-        "steps": [
-          "Открыть вкладку Редактор",
-          "Заполнить поля лекции",
-          "Добавить блоки",
-          "Нажать Сохранить"
-        ]
+        "expectedSteps": ["редактор", "заполнить", "добавить блоки", "сохранить"]
       }
     ],
     "progress": 75
