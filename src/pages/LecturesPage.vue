@@ -20,19 +20,13 @@
         <q-card flat bordered>
           <q-card-section class="row items-center justify-between">
             <div class="text-subtitle1 text-weight-medium">Список лекций</div>
-            <q-btn
-              dense
-              flat
-              icon="add"
-              label="Создать"
-              to="/lectures/edit"
-            />
+            <q-btn dense flat icon="add" label="Создать" to="/lectures/edit" />
           </q-card-section>
           <q-separator />
 
           <q-list bordered separator>
             <q-item
-              v-for="lecture in lectures"
+              v-for="lecture in lectureList"
               :key="lecture.id"
               clickable
               :active="lecture.id === selectedLectureId"
@@ -52,14 +46,35 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed, onMounted, onBeforeUnmount, ref } from 'vue'
 import LectureRenderer from 'src/components/LectureRenderer.vue'
 import lectures from 'src/data/lectures.json'
+import { mergeLectures } from 'src/data/lectureStorage'
 
-const selectedLectureId = ref(lectures[0]?.id)
+const lectureList = ref([])
+const selectedLectureId = ref('')
+
+const refreshLectures = () => {
+  lectureList.value = mergeLectures(lectures)
+
+  const hasSelected = lectureList.value.some((lecture) => lecture.id === selectedLectureId.value)
+
+  if (!hasSelected) {
+    selectedLectureId.value = lectureList.value[0]?.id || ''
+  }
+}
 
 const selectedLecture = computed(() => {
-  return lectures.find((lecture) => lecture.id === selectedLectureId.value)
+  return lectureList.value.find((lecture) => lecture.id === selectedLectureId.value)
+})
+
+onMounted(() => {
+  refreshLectures()
+  window.addEventListener('focus', refreshLectures)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('focus', refreshLectures)
 })
 </script>
 

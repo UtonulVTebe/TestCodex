@@ -7,14 +7,14 @@
       </q-card-section>
       <q-separator />
       <q-list>
-        <q-item v-for="lecture in lectures" :key="lecture.id">
+        <q-item v-for="lecture in lectureList" :key="lecture.id">
           <q-item-section>
             <q-item-label>{{ lecture.title }}</q-item-label>
             <q-item-label caption>{{ lecture.id }}</q-item-label>
           </q-item-section>
           <q-item-section side class="progress-side">
             <q-circular-progress
-              :value="lecture.progress"
+              :value="Number(lecture.progress) || 0"
               size="48px"
               color="primary"
               track-color="grey-3"
@@ -29,7 +29,24 @@
 </template>
 
 <script setup>
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import lectures from 'src/data/lectures.json'
+import { mergeLectures } from 'src/data/lectureStorage'
+
+const lectureList = ref([])
+
+const refreshLectures = () => {
+  lectureList.value = mergeLectures(lectures)
+}
+
+onMounted(() => {
+  refreshLectures()
+  window.addEventListener('focus', refreshLectures)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener('focus', refreshLectures)
+})
 </script>
 
 <style scoped>
