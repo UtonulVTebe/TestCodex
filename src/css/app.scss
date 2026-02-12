@@ -1,3 +1,23 @@
 body {
-  background: #f7f8fb;
+  background: #ffffff;
+  color: #111111;
+}
+
+.q-card {
+  border: 1px solid #111111 !important;
+  box-shadow: none !important;
+  background: #ffffff;
+}
+
+.q-separator {
+  background: #111111 !important;
+}
+
+.q-item.q-router-link--active {
+  background: #f5f5f5;
+  color: #111111;
+}
+
+.q-linear-progress__track {
+  opacity: 0.2;
 }
