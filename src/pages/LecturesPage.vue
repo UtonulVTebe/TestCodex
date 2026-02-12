@@ -11,7 +11,7 @@
           <q-separator />
 
           <q-card-section>
-            <LectureRenderer :blocks="selectedLecture?.blocks || []" />
+            <LectureRenderer :blocks="selectedLecture?.blocks || []" :lecture-id="selectedLecture?.id || ''" />
           </q-card-section>
         </q-card>
       </div>
@@ -46,10 +46,11 @@
 </template>
 
 <script setup>
-import { computed, onMounted, onBeforeUnmount, ref } from 'vue'
+import { computed, onMounted, onBeforeUnmount, ref, watch } from 'vue'
 import LectureRenderer from 'src/components/LectureRenderer.vue'
 import lectures from 'src/data/lectures.json'
 import { mergeLectures } from 'src/data/lectureStorage'
+import { markLectureViewed } from 'src/data/progressStorage'
 
 const lectureList = ref([])
 const selectedLectureId = ref('')
@@ -71,10 +72,16 @@ const selectedLecture = computed(() => {
 onMounted(() => {
   refreshLectures()
   window.addEventListener('focus', refreshLectures)
+  window.addEventListener('lecture-progress-updated', refreshLectures)
 })
 
 onBeforeUnmount(() => {
   window.removeEventListener('focus', refreshLectures)
+  window.removeEventListener('lecture-progress-updated', refreshLectures)
+})
+
+watch(selectedLectureId, (lectureId) => {
+  markLectureViewed(lectureId)
 })
 </script>
 

@@ -76,10 +76,19 @@
 
 <script setup>
 import { computed, ref } from 'vue'
+import { setTaskResult } from 'src/data/progressStorage'
 
 const props = defineProps({
   block: {
     type: Object,
+    required: true
+  },
+  lectureId: {
+    type: String,
+    default: ''
+  },
+  blockIndex: {
+    type: Number,
     required: true
   }
 })
@@ -118,6 +127,7 @@ const targetOptions = computed(() => {
 const setResult = (correct, successText = 'Верно!', failText = 'Есть ошибки, попробуйте ещё раз.') => {
   isCorrect.value = correct
   resultMessage.value = correct ? successText : failText
+  setTaskResult(props.lectureId, props.blockIndex, correct)
 }
 
 const checkTextTask = () => {

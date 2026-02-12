@@ -8,6 +8,8 @@
       <TaskBlock
         v-else-if="taskTypes.includes(block.type)"
         :block="block"
+        :lecture-id="lectureId"
+        :block-index="index"
       />
 
       <q-banner v-else dense rounded class="bg-orange-1 text-orange-10">
@@ -33,6 +35,10 @@ defineProps({
   blocks: {
     type: Array,
     required: true
+  },
+  lectureId: {
+    type: String,
+    default: ''
   }
 })
 </script>

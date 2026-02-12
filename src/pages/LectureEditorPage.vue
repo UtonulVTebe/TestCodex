@@ -140,7 +140,7 @@
             <q-tab-panel name="preview">
               <div class="text-subtitle1">{{ previewLecture.title || 'Без названия' }}</div>
               <div class="text-caption q-mb-md">{{ previewLecture.id || 'no-id' }}</div>
-              <LectureRenderer :blocks="previewLecture.blocks" />
+              <LectureRenderer :blocks="previewLecture.blocks" :lecture-id="previewLecture.id" />
             </q-tab-panel>
             <q-tab-panel name="json">
               <q-input :model-value="jsonPreview" readonly type="textarea" autogrow outlined input-style="font-family: monospace; min-height: 320px" />
