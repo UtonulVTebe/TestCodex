@@ -5,22 +5,53 @@
     "blocks": [
       {
         "type": "paragraph",
+        "title": "",
         "content": "Вводный абзац лекции. Здесь можно объяснить тему занятия."
       },
       {
-        "type": "paragraph",
-        "content": "Добавьте в JSON новые блоки или типы контента, чтобы расширить лекцию."
+        "type": "task-text",
+        "title": "Поясните своими словами",
+        "question": "Что такое Vue-компонент и зачем он нужен?"
+      },
+      {
+        "type": "task-single-choice",
+        "title": "Один правильный ответ",
+        "question": "Какой инструмент отвечает за маршрутизацию во Vue?",
+        "options": ["Vue Router", "Vuex", "Pinia"]
+      },
+      {
+        "type": "task-multi-choice",
+        "title": "Несколько правильных ответов",
+        "question": "Какие элементы относятся к Quasar UI?",
+        "options": ["QBtn", "QCard", "Express Router"]
       }
     ],
     "progress": 40
   },
   {
     "id": "lecture-002",
-    "title": "Компоненты Quasar",
+    "title": "Практика по заданиям",
     "blocks": [
       {
-        "type": "paragraph",
-        "content": "QLayout, QPage и QList помогают быстро собрать интерфейс учебного приложения."
+        "type": "task-match",
+        "title": "Сопоставьте термин и определение",
+        "question": "Соедините понятия:",
+        "pairs": [
+          { "left": "Component", "right": "Переиспользуемый блок интерфейса" },
+          { "left": "Route", "right": "Правило перехода по URL" }
+        ]
+      },
+      {
+        "type": "task-drag-drop",
+        "title": "Распределите по этапам",
+        "question": "Расположите шаги разработки по группам:",
+        "items": ["Собрать требования", "Сверстать UI", "Покрыть тестами"],
+        "targets": ["Планирование", "Реализация", "Проверка"]
+      },
+      {
+        "type": "task-algorithm",
+        "title": "Алгоритм",
+        "question": "Опишите алгоритм добавления новой лекции в систему."
       }
     ],
     "progress": 75
